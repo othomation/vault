@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Vaults</title>
+
+		<link rel="stylesheet" href="./style/index.css" />
+	</head>
+	<body>
+		<div id="wrapper">
+			<!-- ************ HEADER ************************ -->
+			<header>
+				<article class="header__title">
+					<h1>The Vault</h1>
+					<em>Powered by Express, PeerJS, Socket.IO</em>
+				</article>
+				<article class="header__logo">
+					<figure>
+						<img src="./pikachu.svg" />
+					</figure>
+				</article>
+			</header>
+
+			<!-- ************ Enter Vault ************************ -->
+			<form id="form">
+				<div>
+					<label>
+						You can either directly click on the 'Create Room' button or type your own desired room name
+						first
+					</label>
+					<input id="area" placeholder="My Super Room" />
+				</div>
+
+				<article><a type="submit" for="form" id="specific" value="Create room">create room</a></article>
+			</form>
+
+			<!-- ************ HOW IT WORK ************************ -->
+			<section class="how">
+				<article>
+					<figure><img src="https://placekitten.com/200/200" aria-hidden="true" /></figure>
+					<div>
+						<strong>Create a room</strong>
+						<p>
+							Use the big button to create and join your room. It fire my super powerful server (no) and
+							give you on a silver-plate a nice cooked room. For ya.
+						</p>
+					</div>
+				</article>
+				<article>
+					<figure><img src="https://placekitten.com/200/200" aria-hidden="true" /></figure>
+					<div>
+						<strong>Share a room</strong>
+						<p>
+							Each room having an unique ID as it's URL, you can easily share it with your peers and loved
+							one.
+						</p>
+					</div>
+				</article>
+				<article>
+					<figure><img src="https://placekitten.com/200/200" aria-hidden="true" /></figure>
+					<div>
+						<strong>Chill</strong>
+						<p>
+							Eh, it's in the title. Chill down (or work, but it would be a shame to use this for work
+							purpose : please go to jitsi or wathever other good webRTC implementation. xoxo
+						</p>
+					</div>
+				</article>
+			</section>
+
+			<!-- ************ FOOTER *************************  -->
+			<footer>&copy; otho 2020</footer>
+		</div>
+		<script>
+			let enter = document.getElementById('specific');
+			let area = document.getElementById('area');
+			let form = document.getElementsByName('form');
+			let wrapper = document.getElementById('wrapper');
+			let tpStyle = document.createElement('style');
+			document.getElementsByTagName('head')[0].appendChild(tpStyle);
+			enter.addEventListener('click', function (e) {
+				tpStyle.append('');
+				wrapper.className = 'active';
+				let tpStyleMsg;
+				area.value == '' ? (tpStyleMsg = 'generated place') : (tpStyleMsg = area.value);
+				tpStyle.innerHTML += `.active#wrapper::after { content:'Teleportation to ${tpStyleMsg}';}`;
+				setTimeout(() => {
+					if (area.value == '') {
+						enter.setAttribute('href', '/vault');
+						window.location = this.href;
+					} else {
+						enter.setAttribute('href', area.value);
+						window.location = this.href;
+					}
+				}, 3000);
+			});
+			wrapper.className -= 'active';
+		</script>
+	</body>
+</html>

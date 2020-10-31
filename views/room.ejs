@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<script>
+			const ROOM_ID = '<%= roomId %>';
+		</script>
+		<script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js" defer></script>
+
+		<script src="/socket.io/socket.io.js" defer></script>
+		<!-- Load Socket Io On front -->
+		<script src="./script/main.js" defer></script>
+		<link rel="stylesheet" href="./style/room.css" />
+		<title>The Vault</title>
+	</head>
+	<body>
+		<div id="wrapper">
+			<!-- <header>
+				<article class="header__title">
+					<a href="/"><h1>The Vault</h1></a>
+
+					<em>Powered by Express, PeerJS, Socket.IO</em>
+					<span style="display: block" id="roomId"></span>
+				</article>
+				<article class="header__logo">
+					<figure>
+						<img src="./pikachu.svg" />
+					</figure>
+				</article>
+			</header>
+			<hr /> -->
+			<div id="container">
+				<div id="container--video">
+					<video class="peerVideo"></video>
+					<video class="peerVideo"></video>
+					<video class="peerVideo"></video>
+					<video class="peerVideo"></video>
+				</div>
+				<div id="container--selfVideo"></div>
+				<!-- <video id="selfVideo"></video> -->
+			</div>
+			<!-- Endpoint -->
+
+			<script>
+				let peersContainer = document.getElementById('container--video');
+				let peersChildren = { childList: peersContainer.childNodes };
+				let peersChildrenCounter = peersChildren;
+				const observer = new MutationObserver(function () {
+					console.log('change happened');
+					if (peersChildren >= peersChildrenCounter) {
+						console.warn('Added a video ?');
+					} else {
+						console.error('removed a video ?');
+					}
+					console.log('nb child :', peersChildren);
+					console.log('counter (before+1):', {peersChildrenCounter});
+					peersChildrenCounter++;
+				});
+				observer.observe(peersContainer,peersChildren);
+			</script>
+		</div>
+	</body>
+</html>
