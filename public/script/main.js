@@ -3,6 +3,8 @@ const socket = io('/');
 // We Get The Grid, all my homies hate jquery please use vanilla js for that thanks love you
 const videoGrid = document.querySelector('#container--video');
 const videoGridSelf = document.querySelector('#container--selfVideo');
+const name = document.getElementById('name');
+const nameSelf = document.getElementById('nameSelf');
 // console.log(videoGrid); usual check because i'm an unsecure person
 
 const myPeer = new Peer(undefined, {
@@ -12,24 +14,27 @@ const myPeer = new Peer(undefined, {
 
 // We Create self video Component
 const selfVideo = document.createElement('video');
-selfVideo.setAttribute('id','selfVideo');
+selfVideo.setAttribute('id', 'selfVideo');
 selfVideo.muted = true; // Pretty explatanory ?
 
-let peers = {};
+var peersName = []; // debug use case
+let ownName = {}; // debug use case
+let peers = {}; //To
 
 navigator.mediaDevices
 	.getUserMedia({
-		video: true,
-		audio: true,
+		video: true, // Tweak that !
+		audio: true, // Tweak that !
 	})
 	.then((stream) => {
 		// on promise :
+
 		addVideoStream(selfVideo, stream);
 
 		myPeer.on('call', (call) => {
 			call.answer(stream);
 			const video = document.createElement('video');
-			video.setAttribute('class','peerVideo');
+			video.setAttribute('class', 'peerVideo');
 			call.on('stream', (userVideoStream) => {
 				addVideoStream(video, userVideoStream);
 			});
@@ -39,7 +44,8 @@ navigator.mediaDevices
 			setTimeout(() => {
 				connectToNewUser(userId, stream);
 				console.log('User connected :', userId); // Tell The User That Another User Has Arrived
-			}, 3000);
+			}, 1500);
+			alert(userId + ' joined');
 		});
 
 		console.log('all good ?');
@@ -52,9 +58,17 @@ navigator.mediaDevices
 
 socket.on('user-disconnected', (userId) => {
 	setTimeout(() => {
-		console.log('User disconnected :', userId); // Tell The User That Another User Has Arrived
+		// Tell The User (console side :) )That Another User Has Arrived
+		console.log('User disconnected :', userId);
+		for (let i = 0; i < peersName.length; i++) {
+			if (userId == peersName[i]) peersName.splice(i, 1);
+		}
+		if (peersName.length != 0) console.table(peersName);
 		if (peers[userId]) peers[userId].close();
-	}, 3000);
+		for (let id in peers) {
+			if (peers[userId] == id) peers[userId].close();
+		}
+	}, 1500);
 });
 
 // Event Listener on peer
@@ -66,9 +80,22 @@ myPeer.on('open', (id) => {
 function connectToNewUser(userId, stream) {
 	const call = myPeer.call(userId, stream);
 	const video = document.createElement('video');
+	/*
+	For future use cases, i added unique class for each peer. 
+	This struggle to work (as other functions of my project yet) when we're not the first user in the room 
+	*/
+	video.setAttribute('class', `peerVideo ${userId}`);
+
+	// Push the id in an array for the use case of muting other
+	peersName.push(userId);
+	console.table(peersName);
+
+	// Add the video element to html
 	call.on('stream', (userVideoStream) => {
 		addVideoStream(video, userVideoStream);
 	});
+
+	// Remove the video element from html tree
 	call.on('close', () => {
 		// video.innerHTMl=''; somewath a fix
 		video.remove();
@@ -83,28 +110,25 @@ function addVideoStream(video, stream) {
 		video.play(); // When video loaded... play it !
 	});
 	if (video.id == 'selfVideo') {
-		videoGridSelf.append(video); // classic !
-	} 
+		videoGridSelf.append(video);
+	}
 	if (video.id == '') {
-
-		videoGrid.append(video); // classic !
+		videoGrid.append(video);
 	}
 	// videoGrid.innerHTML+=userId.toString();
 }
+let peersContainer = document.getElementById('container--video');
+let peersChildren = { childList: peersContainer.childNodes };
+const other = document.getElementsByTagName('video');
 
+const observer = new MutationObserver(function () {
+	// console.log('Number of peers :', peersChildren['childList'].length);
+	// console.log('Observer[InstanceOfMutationObserver] detected a change on ' + peersContainer.id);
+	if (peersChildren['childList'].length === 0) {
+		alert("You're alone, maybe you want to leave ?");
+	}
+});
+observer.observe(peersContainer, peersChildren);
 /* Front & Ui Links */
-/* let copyLink = document.createElement('a');
-copyLink.innerHTML = `<a id="copyLink" href="${window.location.href}">Copy room's url to the clipboard</a>`;
-document.querySelector('.header__title').append(copyLink);
-copyLink.addEventListener('click', function (e) {
-	e.preventDefault();
-	let loc = document.createElement('textarea');
-	loc.innerHTML = window.location.href;
-	document.body.appendChild(loc);
-	loc.select();
-	document.execCommand('copy');
-	document.body.removeChild(loc);
-	alert('You got the url ! Share it with your loved one. Or your boss. Sad for ya tough.');
-}); */
-/* document.getElementById('roomId').innerHTML += '<b>Room ID</b> --' + ROOM_ID;
-document.getElementsByTagName('title')[0].innerHTML+= '-- ' + ROOM_ID; */
+document.getElementById('roomId').innerHTML += `<b>Room ID</b> <span id="roomidSpan">${ROOM_ID}</span>`;
+document.getElementsByTagName('title')[0].innerHTML += '-- ' + ROOM_ID;

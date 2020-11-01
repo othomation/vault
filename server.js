@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
-const server = require('http').Server(app);
+const http = require('http');
+const server = http.Server(app);
 
 const io = require('socket.io')(server);
 const { v4: uuidV4 } = require('uuid');
@@ -35,7 +36,7 @@ io.on('connection', (socket) => {
 		console.log('roomId :', roomId + ' | userId :', userId);
 		socket.join(roomId); // Send New Arrival To User (sort of add to queue)
 		socket.to(roomId).broadcast.emit('user-connected', userId); // Send This Info To All Except Self (broadcast) (user-connected is an 'event' to listen to in front script)
-
+	
 		socket.on('disconnect', () => {
 			socket.to(roomId).broadcast.emit('user-disconnected', userId);
 		});
@@ -43,3 +44,4 @@ io.on('connection', (socket) => {
 });
 
 server.listen(3000);
+console.log('Running good !')

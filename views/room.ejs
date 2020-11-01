@@ -5,61 +5,51 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 		<script>
+			// Get the room id from back end
 			const ROOM_ID = '<%= roomId %>';
 		</script>
+		<!-- CDN peerjs  -->
 		<script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js" defer></script>
-
+		<!-- <script src="./script/peerjs.min.js" defer></script> -->
+		<!-- local socket io-->
 		<script src="/socket.io/socket.io.js" defer></script>
-		<!-- Load Socket Io On front -->
-		<script src="./script/main.js" defer></script>
-		<link rel="stylesheet" href="./style/room.css" />
+		<!-- main front script  -->
+		<script src="./script/main.min.js" defer></script>
+		<!-- control related front and basic dom manipulation script -->
+		<script src="./script/controls.min.js" defer></script>
+
+		<!-- css file for this.... file ! -->
+		<link rel="stylesheet" href="./style/room.min.css" />
+		<!-- In the top of the control script, inject room id in title tab -->
 		<title>The Vault</title>
+		<style></style>
 	</head>
 	<body>
+		<!-- General wrapper (not used yet)-->
 		<div id="wrapper">
-			<!-- <header>
-				<article class="header__title">
-					<a href="/"><h1>The Vault</h1></a>
+			<!-- Name : To Be Added-->
+			<div id="name"></div>
+			<div id="nameSelf"></div>
 
+			<!-- Show Controls (menu) -->
+			<button id="showControls" onclick="showControls()">⚙️ Controls</button>
+			<div id="controls" class="hidden">
+				<article>
+					<a href="/"><h1>The Vault</h1></a>
 					<em>Powered by Express, PeerJS, Socket.IO</em>
 					<span style="display: block" id="roomId"></span>
+					<div>
+						<a class="control--listen" onclick="listenSelf()">Listen to Self ?</a>
+						<a id="copyLink" href="">Copy room's url to the clipboard</a>
+					</div>
 				</article>
-				<article class="header__logo">
-					<figure>
-						<img src="./pikachu.svg" />
-					</figure>
-				</article>
-			</header>
-			<hr /> -->
-			<div id="container">
-				<div id="container--video">
-					<video class="peerVideo"></video>
-					<video class="peerVideo"></video>
-					<video class="peerVideo"></video>
-					<video class="peerVideo"></video>
-				</div>
-				<div id="container--selfVideo"></div>
-				<!-- <video id="selfVideo"></video> -->
 			</div>
-			<!-- Endpoint -->
-
-			<script>
-				let peersContainer = document.getElementById('container--video');
-				let peersChildren = { childList: peersContainer.childNodes };
-				let peersChildrenCounter = peersChildren;
-				const observer = new MutationObserver(function () {
-					console.log('change happened');
-					if (peersChildren >= peersChildrenCounter) {
-						console.warn('Added a video ?');
-					} else {
-						console.error('removed a video ?');
-					}
-					console.log('nb child :', peersChildren);
-					console.log('counter (before+1):', {peersChildrenCounter});
-					peersChildrenCounter++;
-				});
-				observer.observe(peersContainer,peersChildren);
-			</script>
+			<div id="container">
+				<!-- Peers endpoint -->
+				<div id="container--video"></div>
+			</div>
+			<!-- Self endpoint-->
+			<div id="container--selfVideo"></div>
 		</div>
 	</body>
 </html>
