@@ -43,4 +43,6 @@ J'ai lié ce vps (avec son IP, donc) à un sous domaine `vault.otho.bike`.
 
 S'il le faut, je peux le lier à un nom de domaine fraîchement crée `otho.fun`.
 
-Donc, mon serveur nginx écoute le port 3000.
+Donc, mon serveur nginx écoute le port 3000 qui correspond au process nodeJS.
+
+Mon serveur peerJS tourne sur la même machine (en faisant un `node server.js & peerjs -p 3001 &`) et donc a besoin d'être proxied aussi.
