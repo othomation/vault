@@ -1,48 +1,61 @@
 # Vault
 
-### Stack
+## Stack
 - nodeJS (:3000)
-	- express
-	- uuid
-	- socket.io
-	- peerjs (:3001, path /)
-	- http
-- nginx (:443 sinon :80)
-	- reverse proxy (listen to nodeJS port)
+	- express `^3.1.5`
+	- uuid `^8.3.1`
+	- socket.io `^2.3.0`
+	- peerjs `1.3.1`
 
 ---
-### Qu'est ce que c'est
+## Description
 
-C'est un projet fait en un week end, pour m'entraîner à comprendre webRTC et ce qui tourne autour.
+Video and Audio call app.
+As simple as that.
 
-Du coup, en fonctionalités :
+You can generate a room, either with and unique id thanks to `uuid`, either with a custom name (under some little regEXP rules) thanks to optional routes params of nodeJS.
 
-- Generation d'une room 
-	- uuid
-	- nom customisé (avec une regEx quand même !)
-- Visio conférence
-	- Video
-	- Audio
-		- Se muter (côté front)
-		- Muter les autres (côté front)
-	- Copier le lien de la room avec un bouton
-	- Etre alerté lorsqu'on est seul dans la room
-	- Quelques fonctionalités que j'ai commencé dans le code, mais pas implémenté comme choisir son nom ou autre.
+## v.001 ----
+
+	- Talk, See. Listen, Be Seen.
+	- Mute Self, Mute Peers (front-side only)
+	- Room's URL Copy, User Has Autonomy.
+	- Get an alert when the room's empty.
 
 ---
 
-### Problématique 
+## Technical Informations
 
-Les fonctionalités getUserMedia ont besoin de sécurité, donc de SSL/HTTPS.
+Importants files :
+	- ./server.js ---- Main back-end file. Store nodeJS server boilerplate
+Dev and Prod infrastructure environement are a bit different in the way of security, which will be more explained in the next section.
 
-J'ai un VPS chez OVH.
+Technology is webSocket : so you could technically maintain bridge between you and your peers even if you kill node process.
 
-J'ai deux noms de domaine à disposition pour ma part.
+If you run peerJS server at port `:3001`, you should fire the project as :
+```bash
+node server.js & peerjs -p 3001
+```
 
-J'ai lié ce vps (avec son IP, donc) à un sous domaine `vault.otho.bike`.
+## Deploy guidelines
 
-S'il le faut, je peux le lier à un nom de domaine fraîchement crée `otho.fun`.
+Features used as the `.getUserMedia` method need security.
 
-Donc, mon serveur nginx écoute le port 3000 qui correspond au process nodeJS.
+Using self-signed certificate directly in nodeJS is never a good idea.
 
-Mon serveur peerJS tourne sur la même machine (en faisant un `node server.js & peerjs -p 3001 &`) et donc a besoin d'être proxied aussi.
+You should use a reverse-proxy (or any other method that take responsability of the SSL thingy).
+
+If you want to use Nginx, you should make it listen to `:80` and `:443` ports. Then, make it proxy-pass the node server which can listen at `:3000` port. The peerJS (if you want to host it, like me : you shuld install peerjs globally) can listen to `:3001` port for example.
+
+Then, you need to specify SSL key and certificate to Nginx, not to node. PeerJS should also have the sames credentials. You could either make it raw in front-side javascript (in he `/public/script/main.js` file) or directly specify those credentials in the server-start-up command-line.
+
+So it would be now :
+```bash
+node server.js & peerjs -p 3001 --sslkey yourkey.key --sscert yourcertificate.crt
+```
+
+And heeeere you go. 
+
+Have fun. 
+
+(Right?)

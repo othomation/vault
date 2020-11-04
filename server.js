@@ -1,35 +1,28 @@
+//==== Modules
+require("dotenv").config();
 const express = require('express');
 const app = express();
 const http = require('http');
 const server = http.Server(app);
-
 const io = require('socket.io')(server);
-const { v4: uuidV4 } = require('uuid');
-let salut = 'bonjour';
-// Views
+
+// Routes Import
+const index = require('./routes/front--index');
+const vaultUuid = require('./routes/front--vault_uuid_endpoint');
+const vaultCustom = require('./routes/front--vault_custom_endpoint');
+
+//==== Views
 app.set('view engine', 'ejs');
-// Public
+
+//==== Public
 app.use(express.static('public'));
 
-// Routes
+//=== Routes
+app.use('/', index);
+app.use('/vault', vaultUuid);
+app.use('/:vault', vaultCustom);
 
-app.get('/', (req, res) => {
-	res.render('index');
-});
-app.get('/vault', (req, res) => {
-	res.redirect(`/${uuidV4()}`);
-});
-
-const AREA_REGEX = new RegExp('^[a-zA-Z0-9_-]*$');
-// const invalidValue='Invalid Value. Contact administrator at contact@otho.bike if you need help !';
-app.get('/:room', (req, res) => {
-	if (AREA_REGEX.test(req.params.room)) {
-		res.render('room', { roomId: req.params.room });
-	} else {
-		res.redirect('back');
-	}
-});
-// Socket related
+//==== Socket related
 io.on('connection', (socket) => {
 	// Listen to event
 	socket.on('join-room', (roomId, userId) => {
@@ -43,5 +36,5 @@ io.on('connection', (socket) => {
 	});
 });
 
-server.listen(3000);
-console.log('Running good !')
+server.listen(process.env.HTTP_PORT); 
+console.log(`Running good. \n ---> PORT : ${process.env.HTTP_PORT}`);
