@@ -1,12 +1,14 @@
+// Import Socket.IO front-side
 const socket = io('/');
 
-// We Get The Grid, all my homies hate jquery please use vanilla js for that thanks love you
+// We Get The Container and DOM element, 
+// You don't need jQuery for that. Please use vanilla js for that thanks love you
 const videoGrid = document.querySelector('#container--video');
 const videoGridSelf = document.querySelector('#container--selfVideo');
 const name = document.getElementById('name');
 const nameSelf = document.getElementById('nameSelf');
-// console.log(videoGrid); usual check because i'm an unsecure person
 
+// Declare Peer object (the server)
 const myPeer = new Peer(undefined, {
 	host: '/',
 	port: '3001',
@@ -17,19 +19,18 @@ const selfVideo = document.createElement('video');
 selfVideo.setAttribute('id', 'selfVideo');
 selfVideo.muted = true; // Pretty explatanory ?
 
-var peersName = []; // debug use case
-let ownName = {}; // debug use case
-let peers = {}; //To
+var peersName = [];  // <Work In Progress>
+let ownName = {};  // <Work In Progress>
+let peers = {}; // User To Temp Storage Of Peer
 
+// We Ask For Video And Audio, which return a promise.
 navigator.mediaDevices
 	.getUserMedia({
 		video: true, // Tweak that !
 		audio: true, // Tweak that !
 	})
 	.then((stream) => {
-		// on promise :
-
-		addVideoStream(selfVideo, stream);
+		addVideoStream(selfVideo, stream); 
 
 		myPeer.on('call', (call) => {
 			call.answer(stream);
@@ -51,19 +52,18 @@ navigator.mediaDevices
 		console.log('all good ?');
 	})
 	.catch(() => {
-		console.log('video and audio did not work');
-		// videoGrid.append('sadly your video and audio could not be reached. xoxo');
-		// document.getElementById('header__title').append('sadly your video and audio could not be reached. xoxo');
+		console.log('video and audio did not work'); // Debug Utility
+		videoGrid.append('sadly your video and audio could not be reached. xoxo');
 	});
 
 socket.on('user-disconnected', (userId) => {
 	setTimeout(() => {
 		// Tell The User (console side :) )That Another User Has Arrived
 		console.log('User disconnected :', userId);
-		for (let i = 0; i < peersName.length; i++) {
-			if (userId == peersName[i]) peersName.splice(i, 1);
-		}
-		if (peersName.length != 0) console.table(peersName);
+		for (let i = 0; i < peersName.length; i++) { 			// <Work In Progress>
+			if (userId == peersName[i]) peersName.splice(i, 1); // <Work In Progress>
+		} 														// <Work In Progress>
+		if (peersName.length != 0) console.table(peersName); 	// <Work In Progress>
 		if (peers[userId]) peers[userId].close();
 		for (let id in peers) {
 			if (peers[userId] == id) peers[userId].close();
@@ -98,6 +98,7 @@ function connectToNewUser(userId, stream) {
 	// Remove the video element from html tree
 	call.on('close', () => {
 		// video.innerHTMl=''; somewath a fix
+		// This doesn't work as good as I thinked. Will maybe use <MutationObserver> for that.
 		video.remove();
 	});
 
