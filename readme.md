@@ -79,7 +79,7 @@ Then, you need to specify SSL key and certificate to Nginx, not to node. PeerJS 
 
 So it would be now :
 ```bash
-node server.js & peerjs -p 3001 --sslkey yourkey.key --sscert yourcertificate.crt
+node server.js & peerjs -p 3001 --sslkey yourkey.key --sslcert yourcertificate.crt
 ```
 
 And heeeere you go. 
